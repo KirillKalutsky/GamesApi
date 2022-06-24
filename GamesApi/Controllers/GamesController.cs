@@ -10,11 +10,11 @@ namespace GamesApi.Controllers
     public class GamesController : ControllerBase
     {
         private readonly GameRepository gameRepository;
-        private readonly MyDevelopersRepository developersRepository;
+        private readonly DevelopersRepository developersRepository;
         private readonly IMapper mapper;
 
         public GamesController(IMapper mapper, GameRepository gameRepository, 
-            MyDevelopersRepository developersRepository)
+            DevelopersRepository developersRepository)
         {
             this.mapper = mapper;
             this.gameRepository = gameRepository;

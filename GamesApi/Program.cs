@@ -20,13 +20,15 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services.AddAutoMapper(conf =>
     {
+        conf.AllowNullCollections = true;
+
         conf.CreateMap<Game, Game>()
         .ForMember(old=>old.Id, opt=>opt.Ignore())
          .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null)); ;
 
         conf.CreateMap<GameDto, Game>()
         .ForMember(game => game.GameGenres,
-            opt => opt.MapFrom(dto => dto.GameGenres == null ? null : dto.GameGenres.ToHashSet()))
+            opt => opt.MapFrom(dto => dto.GameGenres.ToHashSet()))
         .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
 
         conf.CreateMap<StudioDeveloperDto, StudioDeveloper>();
