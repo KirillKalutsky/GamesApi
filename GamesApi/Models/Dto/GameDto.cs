@@ -1,4 +1,6 @@
-﻿namespace GamesApi.Models.Dto
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace GamesApi.Models.Dto
 {
     public class GameDto
     {

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using GamesApi;
+using Microsoft.AspNetCore.Mvc;
 using GamesApi.DB.Repositories;
 using GamesApi.Models;
 using AutoMapper;
@@ -13,7 +14,7 @@ namespace GamesApi.Controllers
         private readonly DevelopersRepository developersRepository;
         private readonly IMapper mapper;
 
-        public GamesController(IMapper mapper, GameRepository gameRepository, 
+        public GamesController(IMapper mapper, GameRepository gameRepository,
             DevelopersRepository developersRepository)
         {
             this.mapper = mapper;
@@ -83,14 +84,14 @@ namespace GamesApi.Controllers
         [HttpPost]
         public async Task<IActionResult> IncludeGame([FromBody] GameDto dto)
         {
-            if (dto == null || !ModelState.IsValid)
+            if (dto == null || dto.IsAnyPropertiesNullOrEmpty())
                 return BadRequest();
 
             var game = mapper.Map<Game>(dto);
 
             if (!ModelState.IsValid)
                 return BadRequest();
-            
+
             await gameRepository.CreateAsync(game);
 
             return NoContent();
@@ -100,7 +101,7 @@ namespace GamesApi.Controllers
         public async Task<IActionResult> UpdateGame([FromRoute] Guid gameId,
             [FromBody] GameDto dto)
         {
-            if (dto == null || !ModelState.IsValid)
+            if (dto == null || dto.IsAllPropertiesNullOrEmpty())
                 return BadRequest();
 
             var game = await gameRepository.ReadAsync(gameId);
@@ -110,6 +111,9 @@ namespace GamesApi.Controllers
 
             var newGame = new Game(gameId);
             mapper.Map(dto,newGame);
+
+            if (!ModelState.IsValid)
+                return BadRequest();
 
             await gameRepository.UpdateAsync(newGame);
 

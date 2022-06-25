@@ -20,7 +20,7 @@ namespace GamesApi.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> GetGames(int currentPage, int pageSize)
+        public async Task<IActionResult> GetDevelopers(int currentPage, int pageSize)
         {
             var developers = await developersRepository
                 .GetAllAsync(currentPage, pageSize);
@@ -29,7 +29,7 @@ namespace GamesApi.Controllers
         }
 
         [HttpGet("{developerId}")]
-        public async Task<IActionResult> GetGame([FromRoute] Guid developerId)
+        public async Task<IActionResult> GetDeveloper([FromRoute] Guid developerId)
         {
             var developer = await developersRepository.ReadAsync(developerId);
 
@@ -40,9 +40,9 @@ namespace GamesApi.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> IncludeGame([FromBody] StudioDeveloperDto dto)
+        public async Task<IActionResult> IncludeDeveloper([FromBody] StudioDeveloperDto dto)
         {
-            if (dto == null || !ModelState.IsValid)
+            if (dto == null || dto.IsAnyPropertiesNullOrEmpty())
                 return BadRequest();
 
             var developer = mapper.Map<StudioDeveloper>(dto);
@@ -56,10 +56,10 @@ namespace GamesApi.Controllers
         }
 
         [HttpPatch("{developerId}")]
-        public async Task<IActionResult> UpdateGame([FromRoute] Guid developerId,
+        public async Task<IActionResult> UpdateDeveloper([FromRoute] Guid developerId,
             [FromBody] GameDto dto)
         {
-            if (dto == null || !ModelState.IsValid)
+            if (dto == null || dto.IsAllPropertiesNullOrEmpty())
                 return BadRequest();
 
             var developer = await developersRepository.ReadAsync(developerId);
@@ -70,13 +70,16 @@ namespace GamesApi.Controllers
             var updateDeveloper = new StudioDeveloper(developerId);
             mapper.Map(dto, updateDeveloper);
 
+            if (!ModelState.IsValid)
+                return BadRequest();
+
             await developersRepository.UpdateAsync(updateDeveloper);
 
             return NoContent();
         }
 
         [HttpDelete("{developerId}")]
-        public async Task<IActionResult> DeleteGame([FromRoute] Guid developerId)
+        public async Task<IActionResult> DeleteDeveloper([FromRoute] Guid developerId)
         {
             var developer = await developersRepository.ReadAsync(developerId);
 

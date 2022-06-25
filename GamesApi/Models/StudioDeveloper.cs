@@ -4,9 +4,9 @@
     {
         public StudioDeveloper(Guid id) : base(id) { }
         public StudioDeveloper() : base() { }
-        public string Name { get; set; }
-        public virtual IEnumerable<Game> Games { get; set; }
-        public DateTime FoundingDate { get; set; }
+        public string? Name { get; set; }
+        public virtual IEnumerable<Game>? Games { get; set; }
+        public DateTime? FoundingDate { get; set; }
 
         public override bool Equals(object? obj)
         {
