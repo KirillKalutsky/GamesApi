@@ -13,7 +13,7 @@ namespace GamesApi.DB.Repositories
             set = context.Set<T>();
         }
 
-        public virtual async Task CreateAsync(T obj)
+        public virtual async Task InsertAsync(T obj)
         {
             await set.AddAsync(obj);
             await SaveAsync();
@@ -32,9 +32,9 @@ namespace GamesApi.DB.Repositories
             return true;
         }
 
-        public abstract Task<PageList<T>> GetAllAsync(int currentPage, int pageSize);
+        public abstract Task<PageList<T>> GetAsync(int currentPage, int pageSize);
 
-        public virtual async Task<T> ReadAsync(Guid id) =>
+        public virtual async Task<T> GetAsync(Guid id) =>
             await set.FindAsync(id);
 
         public abstract Task UpdateAsync(T obj);

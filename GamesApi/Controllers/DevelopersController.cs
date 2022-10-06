@@ -1,94 +1,64 @@
-﻿using AutoMapper;
-using GamesApi.DB.Repositories;
+﻿using GamesApi.Services;
+using AutoMapper;
+using GamesApi.DB;
 using GamesApi.Models;
 using GamesApi.Models.Dto;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GamesApi.Controllers
 {
-    [Route("{controller}")]
-    public class DevelopersController : Controller
+    [ApiController]
+    [Route("developers")]
+    public class DevelopersController : BaseApiController
     {
-        private readonly DevelopersRepository developersRepository;
-        private readonly IMapper mapper;
+        private readonly DeveloperService service;
 
-        public DevelopersController(IMapper mapper, DevelopersRepository gameRepository)
+        public DevelopersController(DeveloperService service)
         {
-            this.mapper = mapper;
-            this.developersRepository = gameRepository;
+            this.service = service;
         }
 
 
         [HttpGet]
         public async Task<IActionResult> GetDevelopers(int currentPage, int pageSize)
         {
-            var developers = await developersRepository
-                .GetAllAsync(currentPage, pageSize);
+            var developers = await service
+                .GetDevelopers(currentPage, pageSize);
 
-            return Ok(developers);
+            return ConvertApiResponse(developers);
         }
 
         [HttpGet("{developerId}")]
         public async Task<IActionResult> GetDeveloper([FromRoute] Guid developerId)
         {
-            var developer = await developersRepository.ReadAsync(developerId);
+            var developer = await service.GetDeveloper(developerId);
 
-            if (developer == null)
-                return NotFound();
-
-            return Ok(developer);
+            return ConvertApiResponse(developer);
         }
 
         [HttpPost]
         public async Task<IActionResult> IncludeDeveloper([FromBody] StudioDeveloperDto dto)
         {
-            if (dto == null || dto.IsAnyPropertiesNullOrEmpty())
-                return BadRequest();
+            var response = await service.IncludeDeveloper(dto);
 
-            var developer = mapper.Map<StudioDeveloper>(dto);
-
-            if (!ModelState.IsValid)
-                return BadRequest();
-
-            await developersRepository.CreateAsync(developer);
-
-            return NoContent();
+            return ConvertApiResponse(response);
         }
 
         [HttpPatch("{developerId}")]
         public async Task<IActionResult> UpdateDeveloper([FromRoute] Guid developerId,
             [FromBody] GameDto dto)
         {
-            if (dto == null || dto.IsAllPropertiesNullOrEmpty())
-                return BadRequest();
+            var response = await service.UpdateDeveloper(developerId, dto);
 
-            var developer = await developersRepository.ReadAsync(developerId);
-
-            if (developer == null)
-                return NotFound();
-
-            var updateDeveloper = new StudioDeveloper(developerId);
-            mapper.Map(dto, updateDeveloper);
-
-            if (!ModelState.IsValid)
-                return BadRequest();
-
-            await developersRepository.UpdateAsync(updateDeveloper);
-
-            return NoContent();
+            return ConvertApiResponse(response);
         }
 
         [HttpDelete("{developerId}")]
         public async Task<IActionResult> DeleteDeveloper([FromRoute] Guid developerId)
         {
-            var developer = await developersRepository.ReadAsync(developerId);
+            var response = await service.DeleteDeveloper(developerId);
 
-            if (developer == null)
-                return NotFound();
-
-            await developersRepository.DeleteAsync(developerId);
-
-            return NoContent();
+            return ConvertApiResponse(response);
         }
     }
 }

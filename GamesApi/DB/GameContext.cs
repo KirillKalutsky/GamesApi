@@ -16,8 +16,6 @@ namespace GamesApi.DB
                 .HasMany(dev => dev.Games)
                 .WithOne(dev => dev.StudioDeveloper)
                 .HasForeignKey(g => g.StudioDeveloperId);
-
-            
         }
     }
 }

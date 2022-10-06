@@ -1,3 +1,4 @@
+using GamesApi.Services;
 using System;
 using System.Diagnostics;
 using GamesApi.DB;
@@ -42,8 +43,10 @@ builder.Services
     .AddDbContext<GameContext>(opt => opt.UseNpgsql(cS));
 
 builder.Services.AddScoped<GameContext>();
-builder.Services.AddScoped<GameRepository, MyGameRepository>();
-builder.Services.AddScoped<DevelopersRepository, MyDevelopersRepository>();
+builder.Services.AddScoped<IGameRepository, GameRepository>();
+builder.Services.AddScoped<IDeveloperRepository, DeveloperRepository>();
+builder.Services.AddScoped<GameService>();
+builder.Services.AddScoped<DeveloperService>();
 
 var app = builder.Build();
 

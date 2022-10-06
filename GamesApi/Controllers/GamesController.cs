@@ -1,136 +1,91 @@
-﻿using GamesApi;
+﻿using GamesApi.Services;
+using GamesApi;
 using Microsoft.AspNetCore.Mvc;
 using GamesApi.DB.Repositories;
 using GamesApi.Models;
 using AutoMapper;
 using GamesApi.Models.Dto;
+using GamesApi.DB;
 
 namespace GamesApi.Controllers
 {
-    [Route("{controller}")]
-    public class GamesController : ControllerBase
+    [ApiController]
+    [Route("games")]
+    public class GamesController : BaseApiController
     {
-        private readonly GameRepository gameRepository;
-        private readonly DevelopersRepository developersRepository;
-        private readonly IMapper mapper;
+        private readonly GameService service;
 
-        public GamesController(IMapper mapper, GameRepository gameRepository,
-            DevelopersRepository developersRepository)
+        public GamesController(GameService gameService)
         {
-            this.mapper = mapper;
-            this.gameRepository = gameRepository;
-            this.developersRepository = developersRepository;
+            this.service = service;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetGames(int currentPage, int pageSize)
         {
-            var games = await gameRepository
-                .GetAllAsync(currentPage, pageSize);
+            var response = await service.GetGamesAsync(currentPage, pageSize);
 
-            return Ok(games);
+            return ConvertApiResponse(response);
         }
 
         [HttpGet("genre/{genre}")]
         public async Task<IActionResult> GetGamesByGenre([FromRoute] GameGenre genre, int currentPage, int pageSize)
         {
-            var games = await gameRepository
+            var games = await service
                 .GetGamesByGenreAsync(genre, currentPage, pageSize);
 
-            return Ok(games);
+            return ConvertApiResponse(games);
         }
 
         [HttpGet("{gameId}")]
         public async Task<IActionResult> GetGame([FromRoute] Guid gameId)
         {
-            var game = await gameRepository.ReadAsync(gameId);
+            var game = await service.FindGameById(gameId);
 
-            if (game == null)
-                return NotFound();
-
-            return Ok(game);
+            return ConvertApiResponse(game);
         }
 
         [HttpGet("developer/{developerId}")]
         public async Task<IActionResult> GetDeveloperGames([FromRoute] Guid developerId,
             int currentPage, int pageSize)
         {
-            var developer = await developersRepository.ReadAsync(developerId);
+            var response = await service.GetGamesByDeveloperId(developerId, currentPage, pageSize);
 
-            if (developer == null)
-                return NotFound();
-
-            var games = await gameRepository.
-                GetGamesByDeveloperAsync(developerId, currentPage, pageSize);
-
-            return Ok(games);
+            return ConvertApiResponse(response);
         }
 
         [HttpGet("developer/{developerId}/genre/{genre}")]
         public async Task<IActionResult> GetDeveloperGamesByGenre([FromRoute] Guid developerId,
             [FromRoute] GameGenre genre, int currentPage, int pageSize)
         {
-            var developer = await developersRepository.ReadAsync(developerId);
+            var response = await service.GetGamesByDeveloperIdAndGenre(developerId, genre, currentPage, pageSize);
 
-            if (developer == null)
-                return NotFound();
-
-            var games = await gameRepository.
-               GetGamesByGenreAndDeveloperAsync(genre, developerId, currentPage, pageSize);
-
-            return Ok(games);
+            return ConvertApiResponse(response);
         }
 
         [HttpPost]
         public async Task<IActionResult> IncludeGame([FromBody] GameDto dto)
         {
-            if (dto == null || dto.IsAnyPropertiesNullOrEmpty())
-                return BadRequest();
+            var response = await service.IncludeGame(dto);
 
-            var game = mapper.Map<Game>(dto);
-
-            if (!ModelState.IsValid)
-                return BadRequest();
-
-            await gameRepository.CreateAsync(game);
-
-            return NoContent();
+            return ConvertApiResponse(response);
         }
 
         [HttpPatch("{gameId}")]
         public async Task<IActionResult> UpdateGame([FromRoute] Guid gameId,
             [FromBody] GameDto dto)
         {
-            if (dto == null || dto.IsAllPropertiesNullOrEmpty())
-                return BadRequest();
+            var response = await service.UpdateGame(gameId, dto);
 
-            var game = await gameRepository.ReadAsync(gameId);
-
-            if (game == null)
-                return NotFound();
-
-            var newGame = new Game(gameId);
-            mapper.Map(dto,newGame);
-
-            if (!ModelState.IsValid)
-                return BadRequest();
-
-            await gameRepository.UpdateAsync(newGame);
-
-            return NoContent();
+            return ConvertApiResponse(response);
         }
 
         [HttpDelete("{gameId}")]
         public async Task<IActionResult> DeleteGame([FromRoute] Guid gameId)
         {
-            var game = await gameRepository.ReadAsync(gameId);
+            var response = await service.DeleteGame(gameId);
 
-            if (game == null)
-                return NotFound();
-
-            await gameRepository.DeleteAsync(gameId);
-
-            return NoContent();
+            return ConvertApiResponse(response);
         }
     }
 }
