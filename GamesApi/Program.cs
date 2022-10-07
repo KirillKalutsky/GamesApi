@@ -1,6 +1,4 @@
 using GamesApi.Services;
-using System;
-using System.Diagnostics;
 using GamesApi.DB;
 using GamesApi.DB.Repositories;
 using GamesApi.Models;
@@ -25,14 +23,27 @@ builder.Services.AddAutoMapper(conf =>
 
         conf.CreateMap<Game, Game>()
         .ForMember(old=>old.Id, opt=>opt.Ignore())
-         .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null)); ;
+        .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
 
         conf.CreateMap<GameDto, Game>()
         .ForMember(game => game.GameGenres,
             opt => opt.MapFrom(dto => dto.GameGenres.ToHashSet()))
         .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
 
-        conf.CreateMap<StudioDeveloperDto, StudioDeveloper>();
+        conf.CreateMap<UpdateGameDto, Game>()
+        .ForMember(game => game.GameGenres,
+            opt => opt.MapFrom(dto => dto.GameGenres.ToHashSet()))
+        .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+
+        conf.CreateMap<StudioDeveloper, StudioDeveloper>()
+        .ForMember(old => old.Id, opt => opt.Ignore())
+        .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null)); ;
+
+        conf.CreateMap<StudioDeveloperDto, StudioDeveloper>()
+            .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+
+        conf.CreateMap<UpdateStudioDeveloperDto, StudioDeveloper>()
+            .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
     });
 
 var cS = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")??
