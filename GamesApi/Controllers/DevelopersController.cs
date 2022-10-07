@@ -1,9 +1,7 @@
 ﻿using GamesApi.Services;
-using AutoMapper;
-using GamesApi.DB;
-using GamesApi.Models;
 using GamesApi.Models.Dto;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 
 namespace GamesApi.Controllers
 {
@@ -18,9 +16,10 @@ namespace GamesApi.Controllers
             this.service = service;
         }
 
-
         [HttpGet]
-        public async Task<IActionResult> GetDevelopers(int currentPage, int pageSize)
+        public async Task<IActionResult> GetDevelopers(
+            [Range(1, int.MaxValue, ErrorMessage = "Please enter a value bigger than or equal {1}")] int currentPage = 1,
+            [Range(1, int.MaxValue, ErrorMessage = "Please enter a value bigger than or equal {1}")] int pageSize = 10)
         {
             var developers = await service
                 .GetDevelopers(currentPage, pageSize);
@@ -46,7 +45,7 @@ namespace GamesApi.Controllers
 
         [HttpPatch("{developerId}")]
         public async Task<IActionResult> UpdateDeveloper([FromRoute] Guid developerId,
-            [FromBody] GameDto dto)
+            [FromBody] UpdateStudioDeveloperDto dto)
         {
             var response = await service.UpdateDeveloper(developerId, dto);
 

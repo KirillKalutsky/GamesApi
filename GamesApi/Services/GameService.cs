@@ -77,24 +77,19 @@ namespace GamesApi.Services
 
         public async Task<ApiResponse> IncludeGame(GameDto dto)
         {
-            if (dto == null || dto.IsAnyPropertiesNullOrEmpty())
-                return CreateBadRequest("");
+            var developer = await developersRepository.GetAsync(dto.StudioDeveloperId);
+            if (developer == null)
+                return CreateNotFoundResponse("");
 
             var game = mapper.Map<Game>(dto);
-
-            /*if (!ModelState.IsValid)
-                return BadRequest();*/
 
             await gameRepository.InsertAsync(game);
 
             return CreateSuccessResponse();
         }
 
-        public async Task<ApiResponse> UpdateGame(Guid gameId, GameDto dto)
+        public async Task<ApiResponse> UpdateGame(Guid gameId, UpdateGameDto dto)
         {
-            if (dto == null || dto.IsAllPropertiesNullOrEmpty())
-                return CreateBadRequest("");
-
             var game = await gameRepository.GetAsync(gameId);
 
             if (game == null)
@@ -102,9 +97,6 @@ namespace GamesApi.Services
 
             var newGame = new Game(gameId);
             mapper.Map(dto, newGame);
-
-            /*if (!ModelState.IsValid)
-                return BadRequest();*/
 
             await gameRepository.UpdateAsync(newGame);
 

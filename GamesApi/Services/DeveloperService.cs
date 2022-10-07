@@ -9,9 +9,11 @@ namespace GamesApi.Services
     {
         private readonly IDeveloperRepository repository;
         private readonly IMapper mapper;
-        public DeveloperService(IDeveloperRepository repository)
+        public DeveloperService(IDeveloperRepository repository,
+            IMapper mapper)
         {
             this.repository = repository;
+            this.mapper = mapper;
         }
 
         public async Task<ApiResponse> GetDevelopers(int currentPage, int pageSize)
@@ -34,24 +36,15 @@ namespace GamesApi.Services
 
         public async Task<ApiResponse> IncludeDeveloper(StudioDeveloperDto dto)
         {
-            if (dto == null || dto.IsAnyPropertiesNullOrEmpty())
-                return CreateBadRequest("");
-
             var developer = mapper.Map<StudioDeveloper>(dto);
-
-            /*if (!ModelState.IsValid)
-                return BadRequest();*/
 
             await repository.InsertAsync(developer);
 
             return CreateSuccessResponse();
         }
 
-        public async Task<ApiResponse> UpdateDeveloper(Guid developerId, GameDto dto)
+        public async Task<ApiResponse> UpdateDeveloper(Guid developerId, UpdateStudioDeveloperDto dto)
         {
-            if (dto == null || dto.IsAllPropertiesNullOrEmpty())
-                return CreateBadRequest("");
-
             var developer = await repository.GetAsync(developerId);
 
             if (developer == null)
@@ -59,9 +52,6 @@ namespace GamesApi.Services
 
             var updateDeveloper = new StudioDeveloper(developerId);
             mapper.Map(dto, updateDeveloper);
-
-            /*if (!ModelState.IsValid)
-                return BadRequest();*/
 
             await repository.UpdateAsync(updateDeveloper);
 

@@ -1,11 +1,8 @@
 ﻿using GamesApi.Services;
-using GamesApi;
 using Microsoft.AspNetCore.Mvc;
-using GamesApi.DB.Repositories;
 using GamesApi.Models;
-using AutoMapper;
 using GamesApi.Models.Dto;
-using GamesApi.DB;
+using System.ComponentModel.DataAnnotations;
 
 namespace GamesApi.Controllers
 {
@@ -15,26 +12,24 @@ namespace GamesApi.Controllers
     {
         private readonly GameService service;
 
-        public GamesController(GameService gameService)
+        public GamesController(GameService service)
         {
             this.service = service;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetGames(int currentPage, int pageSize)
+        public async Task<IActionResult> GetGamesByGenre(GameGenre? genre,
+            [Range(1, int.MaxValue, ErrorMessage = "Please enter a value bigger than or equal {1}")] int currentPage = 1,
+            [Range(1, int.MaxValue, ErrorMessage = "Please enter a value bigger than or equal {1}")] int pageSize = 10)
         {
-            var response = await service.GetGamesAsync(currentPage, pageSize);
+            ApiResponse response;
+            if (genre == null)
+                response = await service.GetGamesAsync(currentPage, pageSize);
+            else
+                response = await service
+                .GetGamesByGenreAsync(genre.Value, currentPage, pageSize);
 
             return ConvertApiResponse(response);
-        }
-
-        [HttpGet("genre/{genre}")]
-        public async Task<IActionResult> GetGamesByGenre([FromRoute] GameGenre genre, int currentPage, int pageSize)
-        {
-            var games = await service
-                .GetGamesByGenreAsync(genre, currentPage, pageSize);
-
-            return ConvertApiResponse(games);
         }
 
         [HttpGet("{gameId}")]
@@ -43,24 +38,6 @@ namespace GamesApi.Controllers
             var game = await service.FindGameById(gameId);
 
             return ConvertApiResponse(game);
-        }
-
-        [HttpGet("developer/{developerId}")]
-        public async Task<IActionResult> GetDeveloperGames([FromRoute] Guid developerId,
-            int currentPage, int pageSize)
-        {
-            var response = await service.GetGamesByDeveloperId(developerId, currentPage, pageSize);
-
-            return ConvertApiResponse(response);
-        }
-
-        [HttpGet("developer/{developerId}/genre/{genre}")]
-        public async Task<IActionResult> GetDeveloperGamesByGenre([FromRoute] Guid developerId,
-            [FromRoute] GameGenre genre, int currentPage, int pageSize)
-        {
-            var response = await service.GetGamesByDeveloperIdAndGenre(developerId, genre, currentPage, pageSize);
-
-            return ConvertApiResponse(response);
         }
 
         [HttpPost]
@@ -73,7 +50,7 @@ namespace GamesApi.Controllers
 
         [HttpPatch("{gameId}")]
         public async Task<IActionResult> UpdateGame([FromRoute] Guid gameId,
-            [FromBody] GameDto dto)
+            [FromBody] UpdateGameDto dto)
         {
             var response = await service.UpdateGame(gameId, dto);
 

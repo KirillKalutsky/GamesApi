@@ -18,6 +18,7 @@ namespace GamesApi.DB.Repositories
         {
             return await Task.Run(() => {
                 IQueryable<StudioDeveloper> developers = set
+                    .Include(dev => dev.Games)
                     .OrderBy(dev => dev.Name);
 
                 return new PageList<StudioDeveloper>(developers, currentPage, pageSize);

@@ -12,13 +12,12 @@ namespace GamesApi.DB.Repositories
             this.mapper = mapper;
         }
 
-
         public async override Task<PageList<Game>> GetAsync(int currentPage, int pageSize)
         {
             return await Task.Run(() =>
             {
                 IQueryable<Game> gamesList = set
-                    .Include(game => game.StudioDeveloper)
+                    //.Include(game => game.StudioDeveloper)
                     .OrderBy(game => game.Name);
                 var list = new PageList<Game>(gamesList, currentPage, pageSize);
                 return list;
@@ -54,17 +53,12 @@ namespace GamesApi.DB.Repositories
             return await Task.Run(() =>
             {
                 IQueryable<Game> gamesList = set
-                    .Include(game => game.StudioDeveloper)
+                    //.Include(game => game.StudioDeveloper)
                     .Where(game => game.GameGenres.Contains(genre))
                     .OrderBy(game => game.Name);
                 var list = new PageList<Game>(gamesList, currentPage, pageSize);
                 return list;
             });
-        }
-
-        public override Task<Game> GetAsync(Guid id)
-        {
-            throw new NotImplementedException();
         }
 
         public async override Task UpdateAsync(Game obj)
