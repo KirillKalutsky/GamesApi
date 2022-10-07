@@ -1,8 +1,12 @@
-﻿namespace GamesApi.Models.Dto
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace GamesApi.Models.Dto
 {
     public class StudioDeveloperDto
     {
-        public string? Name { get; set; }
-        public DateTime? FoundingDate { get; set; }
+        [Required]
+        public string Name { get; set; }
+        [Required]
+        public DateTime FoundingDate { get; set; }
     }
 }
