@@ -14,15 +14,13 @@ namespace GamesApi.DB.Repositories
             this.mapper = mapper;
         }
 
-        public override async Task<PageList<StudioDeveloper>> GetAsync(int currentPage, int pageSize)
+        public override Task<PageList<StudioDeveloper>> GetAsync(int currentPage, int pageSize)
         {
-            return await Task.Run(() => {
-                IQueryable<StudioDeveloper> developers = set
-                    .Include(dev => dev.Games)
-                    .OrderBy(dev => dev.Name);
+            IQueryable<StudioDeveloper> developers = set
+                .Include(dev => dev.Games)
+                .OrderBy(dev => dev.Name);
 
-                return new PageList<StudioDeveloper>(developers, currentPage, pageSize);
-            });
+            return Task.FromResult(new PageList<StudioDeveloper>(developers, currentPage, pageSize));
         }
 
         public override async Task UpdateAsync(StudioDeveloper obj)

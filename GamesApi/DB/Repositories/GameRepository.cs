@@ -12,53 +12,41 @@ namespace GamesApi.DB.Repositories
             this.mapper = mapper;
         }
 
-        public async override Task<PageList<Game>> GetAsync(int currentPage, int pageSize)
+        public override Task<PageList<Game>> GetAsync(int currentPage, int pageSize)
         {
-            return await Task.Run(() =>
-            {
-                IQueryable<Game> gamesList = set
-                    //.Include(game => game.StudioDeveloper)
-                    .OrderBy(game => game.Name);
-                var list = new PageList<Game>(gamesList, currentPage, pageSize);
-                return list;
-            });
+            IQueryable<Game> gamesList = set
+                //.Include(game => game.StudioDeveloper)
+                .OrderBy(game => game.Name);
+            var list = new PageList<Game>(gamesList, currentPage, pageSize);
+            return Task.FromResult(list);
         }
 
-        public async Task<PageList<Game>> GetGamesByDeveloperAsync(Guid developerId, int currentPage, int pageSize)
+        public Task<PageList<Game>> GetGamesByDeveloperAsync(Guid developerId, int currentPage, int pageSize)
         {
-            return await Task.Run(() =>
-            {
-                IQueryable<Game> games = set
-                    .Where(game => game.StudioDeveloperId == developerId);
+            IQueryable<Game> games = set
+                .Where(game => game.StudioDeveloperId == developerId);
 
-                return new PageList<Game>(games, currentPage, pageSize);
-            });
+            return Task.FromResult(new PageList<Game>(games, currentPage, pageSize));
         }
 
-        public async Task<PageList<Game>> GetGamesByGenreAndDeveloperAsync(GameGenre genre, Guid developerId, int currentPage, int pageSize)
+        public Task<PageList<Game>> GetGamesByGenreAndDeveloperAsync(GameGenre genre, Guid developerId, int currentPage, int pageSize)
         {
-            return await Task.Run(() =>
-            {
-                IQueryable<Game> games = set
-                    .Where(game =>
-                        game.StudioDeveloperId == developerId &&
-                        game.GameGenres.Contains(genre));
+            IQueryable<Game> games = set
+                .Where(game =>
+                    game.StudioDeveloperId == developerId &&
+                    game.GameGenres.Contains(genre));
 
-                return new PageList<Game>(games, currentPage, pageSize);
-            });
+            return  Task.FromResult(new PageList<Game>(games, currentPage, pageSize));
         }
 
-        public async Task<PageList<Game>> GetGamesByGenreAsync(GameGenre genre, int currentPage, int pageSize)
+        public Task<PageList<Game>> GetGamesByGenreAsync(GameGenre genre, int currentPage, int pageSize)
         {
-            return await Task.Run(() =>
-            {
-                IQueryable<Game> gamesList = set
-                    //.Include(game => game.StudioDeveloper)
-                    .Where(game => game.GameGenres.Contains(genre))
-                    .OrderBy(game => game.Name);
-                var list = new PageList<Game>(gamesList, currentPage, pageSize);
-                return list;
-            });
+            IQueryable<Game> gamesList = set
+                //.Include(game => game.StudioDeveloper)
+                .Where(game => game.GameGenres.Contains(genre))
+                .OrderBy(game => game.Name);
+            var list = new PageList<Game>(gamesList, currentPage, pageSize);
+            return Task.FromResult(list);
         }
 
         public async override Task UpdateAsync(Game obj)
