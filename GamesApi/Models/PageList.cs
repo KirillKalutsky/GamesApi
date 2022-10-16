@@ -2,7 +2,7 @@
 {
     public class PageList<T>
     {
-        public PageList(IEnumerable<T> items, int currentPage, int pageSize)
+        public PageList(IQueryable<T> items, int currentPage, int pageSize)
         {
             if (currentPage <= 0)
                 currentPage = 1;
