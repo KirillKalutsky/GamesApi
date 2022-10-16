@@ -15,11 +15,5 @@ namespace GamesApi.Models
         {
             Id = id;
         }
-
-        public override int GetHashCode()
-        {
-            return Id.GetHashCode();
-        }
-        
     }
 }
